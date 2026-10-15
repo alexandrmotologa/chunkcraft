@@ -1,0 +1,74 @@
+{
+  "name": "chunkcraft",
+  "version": "1.0.0",
+  "description": "Production RAG chunking benchmark, embedding evaluation suite, and React 19 visual retrieval studio",
+  "type": "module",
+  "author": "Alexandr Motologa",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "chunkcraft": "./bin/chunkcraft.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run build:core && npm run build:studio",
+    "build:core": "tsc -p tsconfig.json",
+    "build:studio": "vite build src/studio --outDir ../../dist/studio --emptyOutDir",
+    "dev:studio": "vite src/studio",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "benchmark:example": "node bin/chunkcraft.js benchmark examples/sample-docs/enterprise-policy.md --eval examples/golden-queries.json --format table",
+    "studio:example": "node bin/chunkcraft.js studio examples/sample-docs/enterprise-policy.md"
+  },
+  "dependencies": {
+    "cli-table3": "^0.6.5",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.7",
+    "open": "^10.1.0",
+    "ora": "^8.1.1",
+    "picocolors": "^1.1.1",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.469.0",
+    "postcss": "^8.4.49",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8"
+  },
+  "keywords": [
+    "rag",
+    "retrieval-augmented-generation",
+    "chunking",
+    "vector-search",
+    "markdown-ast",
+    "embeddings",
+    "bm25",
+    "benchmark",
+    "precision-recall",
+    "evaluation-metrics",
+    "typescript",
+    "react-19",
+    "developer-tools",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

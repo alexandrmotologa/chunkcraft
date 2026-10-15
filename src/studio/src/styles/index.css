@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #0b0f19;
+    color: #f1f5f9;
+  }
+}
+
+/* Custom scrollbar for dense code views */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Pulse animation for selected/highlighted chunk */
+@keyframes chunkHighlightPulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 245, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0); }
+}
+
+.chunk-active-pulse {
+  animation: chunkHighlightPulse 1.8s infinite;
+}

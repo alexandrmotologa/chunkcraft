@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 22.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run Vitest Unit Tests
+      run: npm test
+
+    - name: Build Core and Web Studio
+      run: npm run build
+
+    - name: Validate CLI Execution
+      run: |
+        node bin/chunkcraft.js --help
+        node bin/chunkcraft.js chunk examples/sample-docs/enterprise-policy.md --strategy recursive-char
+        node bin/chunkcraft.js benchmark examples/sample-docs/enterprise-policy.md --eval examples/golden-queries.json --format table
