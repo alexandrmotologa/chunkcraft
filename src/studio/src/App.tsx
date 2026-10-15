@@ -213,11 +213,11 @@ export default function App() {
       />
 
       {/* Main Content Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 flex flex-col min-h-0">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 flex flex-col min-h-0">
         {activeTab === 'inspector' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-[720px]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-[500px] lg:min-h-[720px]">
             {/* Left Column: Full Document Stream with Chunk Highlights */}
-            <div className="lg:col-span-7 h-full">
+            <div className="lg:col-span-7 h-[460px] lg:h-full">
               <DocumentViewer
                 documentText={documentText}
                 chunks={chunks}
@@ -228,7 +228,7 @@ export default function App() {
             </div>
 
             {/* Right Column: Chunk Card Explorer */}
-            <div className="lg:col-span-5 h-full">
+            <div className="lg:col-span-5 h-[460px] lg:h-full">
               <ChunkVisualizer
                 chunks={chunks}
                 targetChunkSize={chunkSize}
@@ -240,8 +240,8 @@ export default function App() {
         )}
 
         {activeTab === 'sandbox' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-[720px]">
-            <div className="lg:col-span-6 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-[500px] lg:min-h-[720px]">
+            <div className="lg:col-span-6 h-[460px] lg:h-full">
               <DocumentViewer
                 documentText={documentText}
                 chunks={chunks}
@@ -251,7 +251,7 @@ export default function App() {
               />
             </div>
 
-            <div className="lg:col-span-6 h-full">
+            <div className="lg:col-span-6 h-[460px] lg:h-full">
               <QuerySandbox
                 documentText={documentText}
                 strategy={strategy}
@@ -265,7 +265,7 @@ export default function App() {
         )}
 
         {activeTab === 'tuning' && (
-          <div className="flex-1 min-h-[720px]">
+          <div className="flex-1 min-h-[500px] lg:min-h-[720px]">
             <AutoTunerPanel
               documentText={documentText}
               onApplyConfig={handleApplyTuningConfig}
@@ -274,7 +274,7 @@ export default function App() {
         )}
 
         {activeTab === 'shootout' && (
-          <div className="flex-1 min-h-[720px]">
+          <div className="flex-1 min-h-[500px] lg:min-h-[720px]">
             <ModelShootoutPanel
               documentText={documentText}
               strategy={strategy}
@@ -285,7 +285,7 @@ export default function App() {
         )}
 
         {activeTab === 'queries' && (
-          <div className="flex-1 min-h-[720px]">
+          <div className="flex-1 min-h-[500px] lg:min-h-[720px]">
             <GoldenQueryLab
               documentText={documentText}
               goldenQueries={goldenQueries}
@@ -295,7 +295,7 @@ export default function App() {
         )}
 
         {activeTab === 'comparison' && (
-          <div className="flex-1 min-h-[720px]">
+          <div className="flex-1 min-h-[500px] lg:min-h-[720px]">
             <MetricsComparisonTable
               documentText={documentText}
               chunkSize={chunkSize}

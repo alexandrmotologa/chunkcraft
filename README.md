@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/chunkcraft_logo.png" width="140" alt="ChunkCraft Logo" />
+  <img src="docs/images/chunkcraft_logo.png" raw="true" alt="ChunkCraft Logo" width="130" style="border-radius: 24px;" />
 </p>
 
 <h1 align="center">ChunkCraft</h1>
@@ -51,11 +51,39 @@ Test live queries across Dense Vector, Sparse Okapi BM25, and Hybrid Retrieval w
   <img src="docs/images/chunkcraft_sandbox.png" width="100%" alt="ChunkCraft Interactive Retrieval Sandbox" />
 </p>
 
-### 3. Multi-Strategy Comparison Matrix
+### 3. Hyper-Parameter Auto-Tuning Panel
+Run multi-dimensional grid search across candidate chunk sizes, overlaps, and chunking engines to identify Pareto-optimal configurations that maximize MRR while minimizing context fragmentation.
+
+<p align="center">
+  <img src="docs/images/chunkcraft_tuning.png" width="100%" alt="ChunkCraft Auto-Tuning Hyper-Parameter Optimizer" />
+</p>
+
+### 4. Embedding Model Shootout
+Compare dense models against sparse Okapi BM25 baselines on identical chunks, measuring indexing latency, query turnaround time, MRR, Recall@3, and estimated RAM footprint.
+
+<p align="center">
+  <img src="docs/images/chunkcraft_shootout.png" width="100%" alt="ChunkCraft Embedding Model Shootout" />
+</p>
+
+### 5. Cost & Vector DB Storage Sizer
+Forecast token ingestion API costs and vector database memory overhead (Float32 vectors plus HNSW index graph) across OpenAI, Voyage AI, and local Ollama deployments before scaling ingestion.
+
+<p align="center">
+  <img src="docs/images/chunkcraft_sizer.png" width="100%" alt="ChunkCraft Cost and Vector DB Storage Sizer" />
+</p>
+
+### 6. Multi-Strategy Comparison Matrix
 Compare multiple chunking strategies side by side on Precision@1, Precision@3, Precision@5, Recall@3, Recall@5, MRR, Hit Rate, and Context Fragmentation.
 
 <p align="center">
   <img src="docs/images/chunkcraft_matrix.png" width="100%" alt="ChunkCraft Strategy Comparison Matrix" />
+</p>
+
+### 7. Responsive Mobile & Tablet Experience
+The studio interface adapts across viewport sizes with fluid touch-scrolling navigation, collapsible control drawers, and full document stream inspection on phone and tablet displays.
+
+<p align="center">
+  <img src="docs/images/chunkcraft_mobile.png" width="360" alt="ChunkCraft Studio Mobile Responsive View" />
 </p>
 
 ---
