@@ -44,8 +44,8 @@ Inspect chunks directly over the original document layout with distinct color-co
   <img src="docs/images/chunkcraft_inspector.png" width="100%" alt="ChunkCraft Document Stream and Chunk Inspector" />
 </p>
 
-### 2. Interactive Retrieval Sandbox
-Test live natural language queries against indexed chunks, view ranked results with cosine similarity scores, and jump directly to matching segments.
+### 2. Interactive Retrieval Sandbox with Hybrid RRF Search
+Test live queries across Dense Vector, Sparse Okapi BM25, and Hybrid Retrieval with configurable Reciprocal Rank Fusion (RRF) and linear alpha blending. Pin retrieved chunks directly as ground truth for golden query evaluation.
 
 <p align="center">
   <img src="docs/images/chunkcraft_sandbox.png" width="100%" alt="ChunkCraft Interactive Retrieval Sandbox" />
@@ -62,12 +62,14 @@ Compare multiple chunking strategies side by side on Precision@1, Precision@3, P
 
 ## Key Capabilities
 
-* **Multi-Strategy Chunking Pipeline:** Run documents concurrently through Recursive Character, Markdown AST Section-Aware, Semantic Sentence Boundary, Token Sliding Window, and Hierarchical Parent-Child chunkers.
-* **Retrieval Accuracy Benchmarks:** Measure Precision@1, Precision@3, Precision@5, Recall@3, Recall@5, MRR, and Boundary Fragmentation ratios.
+* **Multi-Strategy Chunking Pipeline:** Run documents through Recursive Character, Markdown AST Section-Aware, Semantic Sentence Boundary, Token Sliding Window, Hierarchical Parent-Child, Code-Aware AST, and JSON Key-Path chunkers.
+* **Hybrid Retrieval & RRF Fusion:** Blends sparse lexical matching (BM25) and dense semantic vectors using Reciprocal Rank Fusion (RRF, k=60) or min-max normalized linear alpha blending.
+* **Pareto Auto-Tuning:** Automated grid search explores combinations of chunk sizes and overlaps to identify the Pareto-optimal configuration maximizing MRR and non-fragmentation.
+* **Embedding Model Shootout:** Run head-to-head comparisons across embedding models (BM25, Mock-384, Mock-768, OpenAI, Voyage AI, Ollama) on identical chunks.
+* **Cost & Vector DB Storage Sizer:** Estimate ingestion API costs and vector database memory footprint (Float32 vectors plus HNSW index graph overhead) before ingesting millions of documents.
+* **Golden Query Lab:** Manage evaluation query pairs and keyword ground-truth vectors, with automated synthesis from document headers and one-click JSON export.
 * **Deterministic Offline Embeddings:** Built-in pseudo-random vector hashing and BM25 sparse retrieval allow full CI testing without external API keys or cloud spend.
-* **Provider Adapters:** Native REST clients for OpenAI (`text-embedding-3-small`, `text-embedding-3-large`), Voyage AI (`voyage-3`, `voyage-code-3`), and local Ollama instances (`bge-m3`, `nomic-embed-text`).
 * **React 19 Visual Studio:** Local interactive web application with real-time chunk highlighting, token meters, overlap visualization, live search sandbox, and side-by-side strategy diff matrix.
-* **Automated Query Generation:** Synthesizes test queries directly from document structure for quick automated evaluations.
 
 ---
 
@@ -96,16 +98,21 @@ Compare multiple chunking strategies side by side on Precision@1, Precision@3, P
 |   * Semantic Boundary (sentence boundary & punctuation heuristics)    |
 |   * Token Sliding Window (exact token budget allocation)              |
 |   * Hierarchical Parent-Child (linked macro/micro retrieval units)    |
+|   * Code-Aware (TypeScript, Python, Go, Rust symbol boundaries)       |
+|   * JSON Key-Path (RFC 8259 structural path tracking)                 |
 +-----------------------------------------------------------------------+
-| Vector Store & Embeddings                                             |
+| Vector Store, Embeddings & Retrieval                                  |
 |   * In-Memory Vector Store with Cosine Similarity                     |
+|   * Hybrid Retriever (Reciprocal Rank Fusion & Linear Blending)       |
 |   * Mock Hash-Based Provider (zero-cost offline CI)                   |
 |   * BM25 Sparse Vector Provider (lexical ranking baseline)            |
 |   * OpenAI / Voyage AI / Ollama Adapters                              |
 +-----------------------------------------------------------------------+
-| Benchmark & Evaluation Suite                                          |
+| Evaluation & Sizing Engines                                           |
 |   * Retrieval Metrics: Precision@K, Recall@K, MRR, Hit Rate           |
-|   * Structural Metrics: Context Fragmentation, Token Variance         |
+|   * Pareto Auto-Tuner: Multi-parameter grid search optimizer          |
+|   * Model Shootout: Multi-model accuracy and latency benchmark        |
+|   * Cost & Sizing: API pricing and HNSW RAM overhead calculator       |
 |   * Exporters: Terminal Table, Markdown, JSON, Standalone HTML       |
 +-----------------------------------------------------------------------+
 ```
@@ -124,34 +131,52 @@ npm install
 npm run build
 ```
 
-### 2. Chunking a Document via CLI
+### 2. Chunking Documents via CLI
 
 ```bash
 # Run Recursive Character chunking
 node bin/chunkcraft.js chunk examples/sample-docs/enterprise-policy.md --strategy recursive-char --chunk-size 500 --chunk-overlap 50
 
-# Run Markdown AST chunking with header hierarchies preserved
-node bin/chunkcraft.js chunk examples/sample-docs/cloud-architecture.md --strategy markdown-ast --chunk-size 400
+# Run Code-Aware chunking on TypeScript source files
+node bin/chunkcraft.js chunk src/core/storage/vector-store.ts --strategy code-aware --chunk-size 300
+
+# Run JSON Key-Path chunking
+node bin/chunkcraft.js chunk examples/golden-queries.json --strategy json-keypath --chunk-size 250
 ```
 
-### 3. Running Benchmark Evaluation
+### 3. Auto-Tuning Optimal Parameters
 
 ```bash
-# Run evaluation across multiple strategies against golden queries
-node bin/chunkcraft.js benchmark examples/sample-docs/enterprise-policy.md \
-  --eval examples/golden-queries.json \
-  --strategies recursive-char,markdown-ast,semantic-boundary,token-window,hierarchical \
-  --format table
+# Search for Pareto-optimal chunk size and overlap
+node bin/chunkcraft.js tune examples/sample-docs/enterprise-policy.md \
+  --sizes 200,400,600 \
+  --overlaps 0,25,50 \
+  --strategies recursive-char,markdown-ast,semantic-boundary
 ```
 
-### 4. Synthesizing Test Queries
+### 4. Running Embedding Model Shootout
 
 ```bash
-# Generate 5 realistic test questions directly from headings and paragraphs
+# Compare BM25, Mock-384, and Mock-768 on identical chunks
+node bin/chunkcraft.js shootout examples/sample-docs/enterprise-policy.md \
+  --providers bm25,mock-384,mock-768
+```
+
+### 5. Estimating Storage & API Cost
+
+```bash
+# Calculate token costs and HNSW RAM sizing
+node bin/chunkcraft.js sizer examples/sample-docs/enterprise-policy.md --chunk-size 400
+```
+
+### 6. Synthesizing Test Queries
+
+```bash
+# Generate realistic evaluation queries directly from document structure
 node bin/chunkcraft.js generate-queries examples/sample-docs/cloud-architecture.md --count 5 --output test-queries.json
 ```
 
-### 5. Launching the Embedded React 19 Studio
+### 7. Launching the Embedded React 19 Studio
 
 ```bash
 # Start the local server and open the Web Studio in browser
@@ -190,6 +215,12 @@ node bin/chunkcraft.js studio examples/sample-docs/enterprise-policy.md --port 5
 5. **`hierarchical` (Parent-Child):**
    Emits parent macro chunks (e.g. 1000 tokens) linked to child micro chunks (e.g. 250 tokens), allowing parent-document retrieval evaluation.
 
+6. **`code-aware` (Code-Aware Symbol Boundaries):**
+   Respects function, class, and interface boundaries in source code across TypeScript, JavaScript, Python, Go, and Rust.
+
+7. **`json-keypath` (JSON Structural Key-Path):**
+   Traverses JSON structures, prepending dot-notated key paths (e.g. `data.users[0].credentials`) to ensure semantic context is retained.
+
 ---
 
 ## Supported Embedding Providers
@@ -215,7 +246,7 @@ chunkcraft/
 │   └── chunkcraft.js               # CLI executable entry point
 ├── src/
 │   ├── cli/
-│   │   ├── commands/               # CLI commands (chunk, benchmark, studio, queries)
+│   │   ├── commands/               # CLI commands (chunk, benchmark, tune, shootout, sizer, studio)
 │   │   └── index.ts                # Commander program definition
 │   ├── core/
 │   │   ├── chunkers/               # Strategy implementations
@@ -224,10 +255,13 @@ chunkcraft/
 │   │   │   ├── markdown-ast.ts
 │   │   │   ├── semantic-boundary.ts
 │   │   │   ├── token-window.ts
-│   │   │   └── hierarchical.ts
+│   │   │   ├── hierarchical.ts
+│   │   │   ├── code-aware.ts
+│   │   │   └── json-keypath.ts
 │   │   ├── embeddings/             # Embedding adapters (Mock, BM25, OpenAI, Voyage, Ollama)
-│   │   ├── evaluation/             # Metrics, golden queries, test runner, exporters
-│   │   ├── storage/                # Vector store, cosine similarity, indexer
+│   │   ├── evaluation/             # Metrics, auto-tuner, model shootout, test runner
+│   │   ├── retrieval/              # Hybrid retrieval (RRF and linear score blending)
+│   │   ├── storage/                # Vector store, cost & sizing calculator, vector math
 │   │   └── tokenizer/              # Token counter and BPE estimator
 │   ├── server/                     # Local Node HTTP REST API server
 │   └── studio/                     # React 19 + Vite + Tailwind CSS Web Studio

@@ -65,6 +65,8 @@ export const StrategyConfigDrawer: React.FC<StrategyConfigDrawerProps> = ({
             <option value="semantic-boundary">Semantic Boundary (Sentence-Aware)</option>
             <option value="token-window">Token Sliding Window (Exact Budget)</option>
             <option value="hierarchical">Hierarchical (Parent-Child Retrieval)</option>
+            <option value="code-aware">Code-Aware (Symbol & AST Boundaries)</option>
+            <option value="json-keypath">JSON Key-Path (Structural RFC8259)</option>
           </select>
         </div>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Header } from './components/Header';
+import { Header, StudioTab } from './components/Header';
 import { DocumentViewer } from './components/DocumentViewer';
 import { ChunkVisualizer } from './components/ChunkVisualizer';
 import { ChunkDetailDrawer } from './components/ChunkDetailDrawer';
@@ -7,10 +7,14 @@ import { QuerySandbox } from './components/QuerySandbox';
 import { MetricsComparisonTable } from './components/MetricsComparisonTable';
 import { StrategyConfigDrawer } from './components/StrategyConfigDrawer';
 import { DocumentModal } from './components/DocumentModal';
-import { DocumentChunk, ChunkingStats } from './types';
+import { AutoTunerPanel } from './components/AutoTunerPanel';
+import { ModelShootoutPanel } from './components/ModelShootoutPanel';
+import { GoldenQueryLab } from './components/GoldenQueryLab';
+import { CostSizerModal } from './components/CostSizerModal';
+import { DocumentChunk, ChunkingStats, GoldenQuery } from './types';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'inspector' | 'sandbox' | 'comparison' | 'queries'>('inspector');
+  const [activeTab, setActiveTab] = useState<StudioTab>('inspector');
   const [documentId, setDocumentId] = useState('enterprise-policy.md');
   const [documentText, setDocumentText] = useState('');
   const [strategy, setStrategy] = useState('recursive-char');
@@ -23,9 +27,11 @@ export default function App() {
   const [stats, setStats] = useState<ChunkingStats | null>(null);
   const [selectedChunk, setSelectedChunk] = useState<DocumentChunk | null>(null);
   const [highlightedChunkIds, setHighlightedChunkIds] = useState<string[]>([]);
+  const [goldenQueries, setGoldenQueries] = useState<GoldenQuery[]>([]);
 
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isDocModalOpen, setIsDocModalOpen] = useState(false);
+  const [isCostSizerOpen, setIsCostSizerOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Initial load
@@ -41,6 +47,7 @@ export default function App() {
         setDocumentId(data.documentId || 'enterprise-policy.md');
         setDocumentText(data.documentText || '');
         runChunking(data.documentText, strategy, chunkSize, chunkOverlap);
+        fetchInitialQueries(data.documentText);
         return;
       }
     } catch {
@@ -51,6 +58,23 @@ export default function App() {
     setDocumentId('enterprise-policy.md');
     setDocumentText(fallbackDoc);
     runChunking(fallbackDoc, strategy, chunkSize, chunkOverlap);
+    fetchInitialQueries(fallbackDoc);
+  };
+
+  const fetchInitialQueries = async (text: string) => {
+    try {
+      const res = await fetch('/api/generate-queries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ documentText: text, count: 5 })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setGoldenQueries(data.queries || []);
+      }
+    } catch {
+      // ignore
+    }
   };
 
   const runChunking = async (
@@ -95,6 +119,7 @@ export default function App() {
     setDocumentId(docName);
     setDocumentText(text);
     runChunking(text, strategy, chunkSize, chunkOverlap);
+    fetchInitialQueries(text);
   };
 
   const handleLocateChunkFromSandbox = (chunkId: string) => {
@@ -104,6 +129,29 @@ export default function App() {
       setHighlightedChunkIds([chunkId]);
       setActiveTab('inspector');
     }
+  };
+
+  const handlePinGroundTruth = (query: string, chunk: DocumentChunk) => {
+    const keywords = (chunk.metadata.sectionHeader || chunk.content.slice(0, 30))
+      .toLowerCase()
+      .split(/\s+/)
+      .slice(0, 4);
+
+    const newQuery: GoldenQuery = {
+      id: `pinned_${Date.now()}`,
+      query,
+      relevantKeywords: keywords
+    };
+
+    setGoldenQueries(prev => [...prev, newQuery]);
+  };
+
+  const handleApplyTuningConfig = (newStrategy: string, newSize: number, newOverlap: number) => {
+    setStrategy(newStrategy);
+    setChunkSize(newSize);
+    setChunkOverlap(newOverlap);
+    runChunking(documentText, newStrategy, newSize, newOverlap);
+    setActiveTab('inspector');
   };
 
   const handleExport = async (format: 'html' | 'markdown' | 'json') => {
@@ -160,6 +208,7 @@ export default function App() {
         avgTokens={stats?.averageChunkTokens || 0}
         onOpenDocModal={() => setIsDocModalOpen(true)}
         onToggleConfig={() => setIsConfigOpen(true)}
+        onOpenCostSizer={() => setIsCostSizerOpen(true)}
         onExport={handleExport}
       />
 
@@ -209,8 +258,39 @@ export default function App() {
                 chunkSize={chunkSize}
                 chunkOverlap={chunkOverlap}
                 onLocateChunk={handleLocateChunkFromSandbox}
+                onPinGroundTruth={handlePinGroundTruth}
               />
             </div>
+          </div>
+        )}
+
+        {activeTab === 'tuning' && (
+          <div className="flex-1 min-h-[720px]">
+            <AutoTunerPanel
+              documentText={documentText}
+              onApplyConfig={handleApplyTuningConfig}
+            />
+          </div>
+        )}
+
+        {activeTab === 'shootout' && (
+          <div className="flex-1 min-h-[720px]">
+            <ModelShootoutPanel
+              documentText={documentText}
+              strategy={strategy}
+              chunkSize={chunkSize}
+              chunkOverlap={chunkOverlap}
+            />
+          </div>
+        )}
+
+        {activeTab === 'queries' && (
+          <div className="flex-1 min-h-[720px]">
+            <GoldenQueryLab
+              documentText={documentText}
+              goldenQueries={goldenQueries}
+              onUpdateQueries={setGoldenQueries}
+            />
           </div>
         )}
 
@@ -251,6 +331,15 @@ export default function App() {
         isOpen={isDocModalOpen}
         onClose={() => setIsDocModalOpen(false)}
         onLoadDocument={handleDocumentChange}
+      />
+
+      <CostSizerModal
+        isOpen={isCostSizerOpen}
+        onClose={() => setIsCostSizerOpen(false)}
+        documentText={documentText}
+        strategy={strategy}
+        chunkSize={chunkSize}
+        chunkOverlap={chunkOverlap}
       />
     </div>
   );

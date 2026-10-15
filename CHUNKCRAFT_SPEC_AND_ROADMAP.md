@@ -260,3 +260,12 @@ export interface BenchmarkMetrics {
 * Example documents and golden queries.
 * Comprehensive test suite execution.
 * Final documentation polish with demo assets.
+
+### Phase 6: Enterprise Intelligence and Extended Retrieval Engines
+* Hybrid Retrieval Engine with Reciprocal Rank Fusion (RRF, k=60) and linear alpha score blending.
+* Pareto Auto-Tuner (`chunkcraft tune` and Studio panel) executing grid search across chunk sizes, overlaps, and strategies to find optimal fitness.
+* Embedding Model Shootout (`chunkcraft shootout` and Studio panel) evaluating accuracy, latency, and memory tradeoffs across models.
+* Cost and Vector DB Storage Sizer (`chunkcraft sizer` and Studio modal) predicting ingestion API dollars and HNSW RAM footprint.
+* Code-Aware Chunker (syntax and symbol boundaries for TS/JS/Py/Go/Rust) and JSON Key-Path Chunker (RFC 8259 path tracking).
+* Golden Query Lab in Web Studio for managing ground truth pairs and pinning retrieved chunks directly from search results.
+

@@ -34,11 +34,14 @@ export class BenchmarkRunner {
     documentText: string,
     strategyName: string,
     options: ChunkingOptions,
-    provider: EmbeddingProvider | 'bm25',
+    provider: EmbeddingProvider | string,
     queries: GoldenQuery[],
     documentId: string = 'doc'
   ): Promise<StrategyEvaluationReport> {
     const chunker: BaseChunker = getChunker(strategyName);
+    const resolvedProvider = typeof provider === 'string'
+      ? (provider === 'bm25' ? 'bm25' : getEmbeddingProvider(provider))
+      : provider;
 
     // 1. Chunking Phase
     const chunkStart = performance.now();
@@ -53,15 +56,15 @@ export class BenchmarkRunner {
     let bm25Engine: BM25Engine | null = null;
     let providerName: string = 'unknown';
 
-    if (provider === 'bm25') {
+    if (resolvedProvider === 'bm25') {
       providerName = 'bm25-lexical';
       bm25Engine = new BM25Engine();
       bm25Engine.indexChunks(chunks);
     } else {
-      providerName = provider.providerName;
+      providerName = resolvedProvider.providerName;
       vectorStore = new VectorStore();
       const texts = chunks.map(c => c.content);
-      const embeddings = await provider.embedBatch(texts);
+      const embeddings = await resolvedProvider.embedBatch(texts);
       for (let i = 0; i < chunks.length; i++) {
         vectorStore.addChunk(chunks[i], embeddings[i]);
       }
@@ -76,8 +79,8 @@ export class BenchmarkRunner {
       let topResults: any[] = [];
       if (bm25Engine) {
         topResults = bm25Engine.search(q.query, 5);
-      } else if (vectorStore && typeof provider !== 'string') {
-        const qVec = await provider.embedText(q.query);
+      } else if (vectorStore && typeof resolvedProvider !== 'string') {
+        const qVec = await resolvedProvider.embedText(q.query);
         topResults = vectorStore.search(qVec, 5);
       }
 

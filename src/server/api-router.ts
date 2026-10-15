@@ -5,6 +5,10 @@ import { VectorStore } from '../core/storage/vector-store.js';
 import { BenchmarkRunner } from '../core/evaluation/test-runner.js';
 import { generateGoldenQueries } from '../core/evaluation/golden-query-gen.js';
 import { countTokens } from '../core/tokenizer/token-counter.js';
+import { HybridRetriever } from '../core/retrieval/hybrid-retriever.js';
+import { AutoTuner } from '../core/evaluation/auto-tuner.js';
+import { ModelShootout } from '../core/evaluation/model-shootout.js';
+import { calculateCostAndSizing } from '../core/storage/cost-calculator.js';
 
 export interface ServerState {
   activeDocumentText: string;
@@ -159,7 +163,7 @@ export async function handleApiRequest(
       return true;
     }
 
-    // POST /api/query (Interactive Vector Search)
+    // POST /api/query (Interactive Vector, BM25, or Hybrid Search)
     if (req.method === 'POST' && pathname === '/api/query') {
       const body = await readJsonBody();
       const query = (body.query || '').trim();
@@ -175,6 +179,7 @@ export async function handleApiRequest(
         chunkOverlap: Number(body.chunkOverlap) || 50
       };
       const providerName = body.provider || 'mock';
+      const mode = body.mode || (providerName === 'bm25' ? 'sparse' : 'dense');
       const topK = Number(body.topK) || 5;
 
       const chunker = getChunker(strategy);
@@ -183,7 +188,24 @@ export async function handleApiRequest(
       let results: any[] = [];
       const startTime = performance.now();
 
-      if (providerName === 'bm25') {
+      if (mode === 'hybrid') {
+        const denseProvider = getEmbeddingProvider(providerName === 'bm25' ? 'mock' : providerName, body.providerConfig || {});
+        const bm25Engine = new BM25Engine();
+        bm25Engine.indexChunks(chunks);
+
+        const vectorStore = new VectorStore();
+        const texts = chunks.map(c => c.content);
+        const embeddings = await denseProvider.embedBatch(texts);
+        for (let i = 0; i < chunks.length; i++) {
+          vectorStore.addChunk(chunks[i], embeddings[i]);
+        }
+
+        const hybrid = new HybridRetriever(vectorStore, bm25Engine, denseProvider, {
+          fusionMethod: body.fusionMethod || 'rrf',
+          alpha: typeof body.alpha === 'number' ? body.alpha : 0.5
+        });
+        results = await hybrid.search(query, topK);
+      } else if (providerName === 'bm25' || mode === 'sparse') {
         const engine = new BM25Engine();
         engine.indexChunks(chunks);
         results = engine.search(query, topK);
@@ -204,6 +226,7 @@ export async function handleApiRequest(
       sendJson(200, {
         query,
         provider: providerName,
+        mode,
         strategy,
         totalChunks: chunks.length,
         latencyMs: Number(latencyMs.toFixed(2)),
@@ -244,6 +267,87 @@ export async function handleApiRequest(
       const suiteResult = await runner.runSuite(text, queries, options, state.activeDocumentId);
 
       sendJson(200, suiteResult);
+      return true;
+    }
+
+    // POST /api/tune (Auto-Tuning Parameter Optimization)
+    if (req.method === 'POST' && pathname === '/api/tune') {
+      const body = await readJsonBody();
+      const text = body.documentText || state.activeDocumentText;
+      let queries = body.queries;
+      if (!queries || !Array.isArray(queries) || queries.length === 0) {
+        queries = generateGoldenQueries(text, 5);
+      }
+
+      const tuner = new AutoTuner();
+      const result = await tuner.tune(
+        text,
+        queries,
+        {
+          chunkSizes: body.chunkSizes,
+          chunkOverlaps: body.chunkOverlaps,
+          strategies: body.strategies,
+          provider: body.provider || 'mock'
+        },
+        state.activeDocumentId
+      );
+
+      sendJson(200, result);
+      return true;
+    }
+
+    // POST /api/shootout (Embedding Model Shootout)
+    if (req.method === 'POST' && pathname === '/api/shootout') {
+      const body = await readJsonBody();
+      const text = body.documentText || state.activeDocumentText;
+      const strategy = body.strategy || 'recursive-char';
+      const options = {
+        chunkSize: Number(body.chunkSize) || 500,
+        chunkOverlap: Number(body.chunkOverlap) || 50
+      };
+
+      const chunker = getChunker(strategy);
+      const chunks = await chunker.chunk(text, options, state.activeDocumentId);
+
+      let queries = body.queries;
+      if (!queries || !Array.isArray(queries) || queries.length === 0) {
+        queries = generateGoldenQueries(text, 5);
+      }
+
+      const targets = body.targets || [
+        { provider: 'bm25' },
+        { provider: 'mock', dimensions: 384 },
+        { provider: 'mock', dimensions: 768 }
+      ];
+
+      const shootout = new ModelShootout();
+      const result = await shootout.runShootout(chunks, queries, targets, state.activeDocumentId);
+
+      sendJson(200, result);
+      return true;
+    }
+
+    // POST /api/cost-estimate (Financial & RAM footprint calculator)
+    if (req.method === 'POST' && pathname === '/api/cost-estimate') {
+      const body = await readJsonBody();
+      let totalTokens = Number(body.totalTokens);
+      let totalChunks = Number(body.totalChunks);
+
+      if (!totalTokens || !totalChunks) {
+        const text = body.documentText || state.activeDocumentText;
+        const strategy = body.strategy || 'recursive-char';
+        const options = {
+          chunkSize: Number(body.chunkSize) || 500,
+          chunkOverlap: Number(body.chunkOverlap) || 50
+        };
+        const chunker = getChunker(strategy);
+        const chunks = await chunker.chunk(text, options, state.activeDocumentId);
+        totalChunks = chunks.length;
+        totalTokens = chunks.reduce((acc, c) => acc + c.tokenCount, 0);
+      }
+
+      const estimate = calculateCostAndSizing(totalTokens, totalChunks);
+      sendJson(200, estimate);
       return true;
     }
 

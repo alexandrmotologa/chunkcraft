@@ -4,6 +4,8 @@ import { MarkdownAstChunker } from './markdown-ast.js';
 import { SemanticBoundaryChunker } from './semantic-boundary.js';
 import { TokenSlidingWindowChunker } from './token-window.js';
 import { HierarchicalChunker } from './hierarchical.js';
+import { CodeAwareChunker } from './code-aware.js';
+import { JsonKeyPathChunker } from './json-keypath.js';
 
 export * from './base.js';
 export * from './recursive-char.js';
@@ -11,13 +13,17 @@ export * from './markdown-ast.js';
 export * from './semantic-boundary.js';
 export * from './token-window.js';
 export * from './hierarchical.js';
+export * from './code-aware.js';
+export * from './json-keypath.js';
 
 const registry: Record<string, () => BaseChunker> = {
   'recursive-char': () => new RecursiveCharacterChunker(),
   'markdown-ast': () => new MarkdownAstChunker(),
   'semantic-boundary': () => new SemanticBoundaryChunker(),
   'token-window': () => new TokenSlidingWindowChunker(),
-  'hierarchical': () => new HierarchicalChunker()
+  'hierarchical': () => new HierarchicalChunker(),
+  'code-aware': () => new CodeAwareChunker(),
+  'json-keypath': () => new JsonKeyPathChunker()
 };
 
 /**
