@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="facetPrimary" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="facetLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="facetDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="cyanAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00f5ff"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Luxury White Squircle Container -->
+  <rect x="6" y="6" width="1012" height="1012" rx="220" fill="url(#bgGrad)" stroke="#e2e8f0" stroke-width="6"/>
+
+  <!-- Hexagonal Gateway Frame -->
+  <polygon points="512,102 867,307 867,717 512,922 157,717 157,307" fill="none" stroke="#0f172a" stroke-width="36" stroke-linejoin="round"/>
+  <polygon points="512,122 850,317 850,707 512,898 174,707 174,317" fill="none" stroke="#00f5ff" stroke-width="4" stroke-dasharray="14 10" opacity="0.45" stroke-linejoin="round"/>
+
+  <!-- Watertight Base Silhouette (Beaver Master Craftsman) -->
+  <path d="M 512 210
+           L 620 225 L 700 270 L 755 350 L 760 450 L 780 540 L 750 670 L 660 760 L 512 805
+           L 364 760 L 274 670 L 244 540 L 264 450 L 269 350 L 324 270 L 404 225 Z"
+        fill="#0f172a" />
+
+  <!-- Ears (Left & Right) -->
+  <!-- Left Ear -->
+  <polygon points="324,270 280,210 360,200 404,225" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="280,210 330,170 380,195 360,200" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="310,215 345,190 355,215" fill="#00f5ff" opacity="0.8"/>
+  <!-- Right Ear -->
+  <polygon points="700,270 744,210 664,200 620,225" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="744,210 694,170 644,195 664,200" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="714,215 679,190 669,215" fill="#00f5ff" opacity="0.8"/>
+
+  <!-- Forehead & Crown Facets -->
+  <polygon points="512,210 404,225 512,310" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="512,210 620,225 512,310" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="404,225 324,270 410,335 512,310" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="620,225 700,270 614,335 512,310" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+
+  <!-- Brow & Midface Bridge -->
+  <polygon points="512,310 410,335 440,430 512,410" fill="#64748b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="512,310 614,335 584,430 512,410" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="410,335 324,270 290,370 380,410" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="614,335 700,270 734,370 644,410" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+
+  <!-- Eye Sockets & Almond Eyes (Predator Cant slanting up toward ears) -->
+  <!-- Left Eye Socket & Eye -->
+  <polygon points="410,335 380,410 440,430" fill="#0f172a" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="388,382 432,388 424,402 384,394" fill="#00f5ff"/>
+  <polygon points="402,385 414,387 410,399 400,397" fill="#0f172a"/>
+  <!-- Right Eye Socket & Eye -->
+  <polygon points="614,335 644,410 584,430" fill="#0f172a" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="636,382 592,388 600,402 640,394" fill="#00f5ff"/>
+  <polygon points="622,385 610,387 614,399 624,397" fill="#0f172a"/>
+
+  <!-- Cheeks / Lateral Facets -->
+  <polygon points="290,370 264,450 340,510 380,410" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="734,370 760,450 684,510 644,410" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="264,450 244,540 330,590 340,510" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="760,450 780,540 694,590 684,510" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+
+  <!-- Snout / Nose Bridge (Disciplined Geometry) -->
+  <polygon points="512,410 440,430 460,515 512,525" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="512,410 584,430 564,515 512,525" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+
+  <!-- Nose Pad (Matte Obsidian Diamond) -->
+  <polygon points="512,525 470,555 512,590 554,555" fill="#0f172a" stroke="#00f5ff" stroke-width="2"/>
+
+  <!-- Muzzle Fur Pads (Spreading horizontally and laterally, refined titanium slate, anti-buck-tooth) -->
+  <polygon points="470,555 460,515 380,520 370,610 460,630 512,590" fill="#64748b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="554,555 564,515 644,520 654,610 564,630 512,590" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+
+  <polygon points="380,520 340,510 330,590 370,610" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="644,520 684,510 694,590 654,610" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+
+  <!-- Lower Jaw & Craft Chisel Armor (Clean architectural chevron) -->
+  <polygon points="512,590 460,630 512,675" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="512,590 564,630 512,675" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+
+  <!-- Precision Chisel Edge Accent (Sleek horizontal chevron cutting blade) -->
+  <polygon points="460,630 512,675 564,630 540,645 512,685 484,645" fill="#00f5ff" opacity="0.95" stroke="#0f172a" stroke-width="1.5"/>
+
+  <!-- Chin & Neck Armor Facets -->
+  <polygon points="460,630 370,610 400,700 480,680" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="564,630 654,610 624,700 544,680" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+
+  <polygon points="484,645 512,685 540,645 512,740 440,750" fill="#0f172a" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="540,645 512,685 512,740 584,750" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+
+  <polygon points="330,590 274,670 350,730 400,700 370,610" fill="#0f172a" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="694,590 750,670 674,730 624,700 654,610" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+
+  <polygon points="400,700 350,730 440,750 480,680" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="624,700 674,730 584,750 544,680" fill="#475569" stroke="#0f172a" stroke-width="2"/>
+
+  <polygon points="350,730 364,760 440,750" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="674,730 660,760 584,750" fill="#334155" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="440,750 364,760 512,805" fill="#0f172a" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="584,750 660,760 512,805" fill="#1e293b" stroke="#0f172a" stroke-width="2"/>
+
+</svg>
